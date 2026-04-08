@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yatra Express — Discover Incredible India</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+<style>
+:root{--green:#2D6A2E;--sage:#A8C97A;--sand:#E8C99A;--cream:#FBF5E6;--red:#C0392B;--gold:#E8A838;--dark:#0F1A10;--dark2:#132014;--dark3:#0C1610;--cream60:rgba(251,245,230,0.6);--cream30:rgba(251,245,230,0.3);--cream10:rgba(251,245,230,0.1);}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--cream);overflow-x:hidden;cursor:none;}
+
+/* CURSOR */
+.cursor{width:10px;height:10px;background:var(--red);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s;}
+.cursor-ring{width:36px;height:36px;border:1px solid rgba(192,57,43,0.5);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .35s,height .35s,border-color .2s;}
+body:has(a:hover) .cursor,body:has(button:hover) .cursor,body:has(.h-card:hover) .cursor{width:5px;height:5px;}
+body:has(a:hover) .cursor-ring,body:has(button:hover) .cursor-ring,body:has(.h-card:hover) .cursor-ring{width:58px;height:58px;border-color:var(--red);}
+
+/* LOADER */
+.loader{position:fixed;inset:0;background:var(--dark);z-index:1000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:28px;}
+.loader-symbol{font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:900;color:var(--cream);line-height:1;}
+.loader-symbol span{color:var(--green);}
+.loader-tagline{font-size:10px;letter-spacing:.35em;text-transform:uppercase;color:var(--cream60);margin-top:-16px;}
+.loader-bar-wrap{width:220px;height:1px;background:rgba(168,201,122,0.15);position:relative;overflow:hidden;}
+.loader-bar{height:100%;width:0%;background:var(--red);position:absolute;top:0;left:0;}
+.loader-num{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.2em;color:var(--gold);}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 56px;height:72px;display:flex;align-items:center;transition:background .4s,backdrop-filter .4s;}
+.nav.scrolled{background:rgba(15,26,16,0.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(192,57,43,0.2);}
+.nav-logo{display:flex;align-items:center;gap:10px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.28em;font-weight:700;color:var(--cream);text-transform:uppercase;text-decoration:none;}
+.nav-logo svg{width:20px;height:20px;stroke:var(--cream);fill:none;stroke-width:1.5;}
+.nav-links{margin-left:auto;display:flex;gap:32px;align-items:center;list-style:none;}
+.nav-links a{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--cream60);text-decoration:none;position:relative;padding-bottom:3px;transition:color .2s;}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1.5px;background:var(--green);transition:width .3s cubic-bezier(0.22,1,0.36,1);}
+.nav-links a:hover{color:var(--cream);}
+.nav-links a:hover::after,.nav-links a.active::after{width:100%;}
+.nav-links a.active{color:var(--sage);}
+.nav-actions{display:flex;gap:18px;margin-left:32px;align-items:center;}
+.nav-actions svg{width:16px;height:16px;stroke:var(--cream60);fill:none;stroke-width:1.5;cursor:pointer;transition:stroke .2s;}
+.nav-actions svg:hover{stroke:var(--cream);}
+
+/* HERO */
+.hero{position:relative;height:100vh;min-height:600px;overflow:hidden;}
+.hero-bg-wrap{position:absolute;inset:0;overflow:hidden;}
+.hero-bg{position:absolute;inset:-8%;background-size:cover;background-position:center;will-change:transform;}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,26,16,0.82) 0%,rgba(15,26,16,0.35) 55%,rgba(15,26,16,0.05) 100%);z-index:1;}
+.hero-overlay2{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,26,16,0.65) 0%,transparent 50%);z-index:1;}
+.hero-content{position:absolute;z-index:10;bottom:130px;left:56px;max-width:460px;}
+.hero-eyebrow{display:flex;align-items:center;gap:12px;font-size:12px;letter-spacing:.14em;color:rgba(251,245,230,0.72);margin-bottom:12px;text-transform:uppercase;}
+.hero-eyebrow::before{content:'';width:28px;height:2px;background:var(--green);flex-shrink:0;}
+.hero-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(62px,8vw,94px);font-weight:900;color:var(--cream);line-height:.88;text-transform:uppercase;letter-spacing:-.01em;margin-bottom:18px;}
+.hero-desc{font-size:13px;color:var(--cream60);line-height:1.8;font-weight:300;margin-bottom:28px;max-width:340px;}
+.hero-actions{display:flex;align-items:center;gap:14px;}
+.btn-green{display:flex;align-items:center;gap:8px;background:var(--green);color:var(--cream);font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;padding:13px 26px;border-radius:100px;border:none;cursor:pointer;transition:background .25s,transform .2s;}
+.btn-green:hover{background:var(--sage);color:var(--dark);transform:translateY(-2px);}
+.btn-ghost{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--cream);border:1px solid var(--cream30);padding:13px 22px;border-radius:100px;background:none;cursor:pointer;transition:border-color .25s,background .25s,transform .2s;}
+.btn-ghost:hover{border-color:var(--cream);background:var(--cream10);transform:translateY(-2px);}
+.hero-cards{position:absolute;z-index:10;bottom:68px;right:56px;display:flex;gap:12px;align-items:flex-end;}
+.h-card{width:134px;height:198px;border-radius:14px;overflow:hidden;flex-shrink:0;position:relative;cursor:pointer;transition:transform .4s cubic-bezier(0.22,1,0.36,1);}
+.h-card:hover{transform:translateY(-8px) scale(1.03);}
+.h-card-img{position:absolute;inset:-10%;background-size:cover;background-position:center;will-change:transform;transition:transform .6s ease;}
+.h-card:hover .h-card-img{transform:scale(1.1);}
+.h-card-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,26,16,.88) 0%,rgba(15,26,16,.02) 65%);}
+.h-card-body{position:absolute;bottom:0;left:0;right:0;padding:12px 11px;}
+.h-card-region{font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--cream60);margin-bottom:5px;display:flex;align-items:center;gap:5px;}
+.h-card-region::before{content:'';width:12px;height:1.5px;background:var(--sage);flex-shrink:0;}
+.h-card-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--cream);line-height:1.1;text-transform:uppercase;}
+.hero-bar{position:absolute;z-index:10;bottom:20px;left:56px;right:56px;display:flex;align-items:center;}
+.nav-circles{display:flex;gap:8px;}
+.nc{width:36px;height:36px;border-radius:50%;border:1px solid var(--cream30);display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(251,245,230,0.05);transition:background .2s,border-color .2s,transform .15s;}
+.nc:hover{background:rgba(251,245,230,0.12);border-color:var(--cream60);}
+.nc:active{transform:scale(.88);}
+.nc svg{width:13px;height:13px;stroke:var(--cream);fill:none;stroke-width:2.2;}
+.prog-track{flex:1;margin:0 20px;height:1.5px;background:var(--cream10);border-radius:2px;position:relative;overflow:hidden;}
+.prog-fill{position:absolute;top:0;left:0;height:100%;background:var(--gold);border-radius:2px;width:0%;}
+.slide-num{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;color:rgba(251,245,230,0.85);min-width:50px;text-align:right;}
+.morph-card{position:absolute;z-index:50;pointer-events:none;overflow:hidden;border-radius:14px;opacity:0;}
+.morph-card-img{position:absolute;inset:0;background-size:cover;background-position:center;}
+.scroll-indicator{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);z-index:20;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.scroll-line{width:1px;height:52px;background:linear-gradient(to bottom,rgba(251,245,230,0),rgba(251,245,230,0.3));position:relative;overflow:hidden;}
+.scroll-line::after{content:'';position:absolute;top:-100%;left:0;width:100%;height:100%;background:var(--gold);animation:scrollLine 1.8s ease infinite;}
+@keyframes scrollLine{to{top:200%;}}
+.scroll-text{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--cream30);writing-mode:vertical-rl;transform:rotate(180deg);}
+
+/* SHARED */
+section{position:relative;overflow:hidden;}
+.section-label{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--sage);font-weight:500;display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.section-label::before{content:'';width:32px;height:1.5px;background:var(--green);}
+.featured-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(42px,5vw,64px);font-weight:800;line-height:.92;text-transform:uppercase;}
+
+/* FEATURED */
+.featured{padding:120px 56px;background:var(--dark2);}
+.featured-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:64px;}
+.featured-desc{max-width:280px;font-size:13px;color:var(--cream60);line-height:1.75;font-weight:300;}
+.dest-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr;grid-template-rows:300px 280px;gap:16px;}
+.dest-item{border-radius:16px;overflow:hidden;position:relative;cursor:pointer;}
+.dest-item:first-child{grid-row:1/3;}
+.dest-item-bg{position:absolute;inset:-8%;background-size:cover;background-position:center;will-change:transform;transition:transform .8s cubic-bezier(0.22,1,0.36,1);}
+.dest-item:hover .dest-item-bg{transform:scale(1.06);}
+.dest-item-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,26,16,.85) 0%,rgba(15,26,16,.04) 55%);transition:background .4s;}
+.dest-item:hover .dest-item-ov{background:linear-gradient(to top,rgba(15,26,16,.92) 0%,rgba(15,26,16,.14) 55%);}
+.dest-item-body{position:absolute;bottom:0;left:0;right:0;padding:20px 22px;z-index:2;}
+.dest-item-region{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--cream60);display:flex;align-items:center;gap:7px;margin-bottom:6px;}
+.dest-item-region::before{content:'';width:16px;height:1.5px;background:var(--sage);}
+.dest-item-name{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;text-transform:uppercase;line-height:1.05;margin-bottom:8px;}
+.dest-item:first-child .dest-item-name{font-size:38px;}
+.dest-item-tag{display:inline-block;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--sage);border:1px solid rgba(168,201,122,0.4);padding:4px 10px;border-radius:100px;transform:translateY(6px);opacity:0;transition:transform .35s,opacity .35s;}
+.dest-item:hover .dest-item-tag{transform:translateY(0);opacity:1;}
+
+/* HORIZONTAL SCROLL */
+.hscroll-section{padding:100px 0;background:var(--dark3);overflow:hidden;}
+.hscroll-label{padding:0 56px;margin-bottom:48px;}
+.hscroll-track-wrap{overflow:hidden;position:relative;}
+.hscroll-track{display:flex;gap:20px;padding:0 56px;will-change:transform;}
+.hs-card{flex-shrink:0;width:280px;border-radius:14px;overflow:hidden;position:relative;aspect-ratio:3/4;cursor:pointer;}
+.hs-card-img{position:absolute;inset:-8%;background-size:cover;background-position:center;transition:transform .6s cubic-bezier(0.22,1,0.36,1);}
+.hs-card:hover .hs-card-img{transform:scale(1.06);}
+.hs-card-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,26,16,.85) 0%,rgba(15,26,16,.04) 60%);}
+.hs-card-body{position:absolute;bottom:0;padding:18px 16px;}
+.hs-card-region{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--cream60);display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.hs-card-region::before{content:'';width:10px;height:1.5px;background:var(--sage);}
+.hs-card-name{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;line-height:1.1;}
+
+/* BUDGET PLANNER */
+.budget-section{padding:120px 56px;background:var(--dark3);position:relative;overflow:hidden;}
+.budget-section::before{content:'';position:absolute;top:-200px;right:-200px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(45,106,46,0.08) 0%,transparent 70%);pointer-events:none;}
+.budget-inner{max-width:1200px;margin:0 auto;}
+.budget-subtitle{font-size:14px;color:var(--cream60);line-height:1.75;font-weight:300;max-width:480px;margin-top:16px;}
+.budget-controls{background:var(--dark2);border:1px solid rgba(232,168,56,0.12);border-radius:20px;padding:40px 44px;margin-bottom:48px;margin-top:48px;}
+.budget-filters{display:flex;gap:40px;margin-bottom:36px;flex-wrap:wrap;}
+.filter-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--cream60);margin-bottom:12px;}
+.filter-pills{display:flex;gap:8px;flex-wrap:wrap;}
+.fpill{font-size:11px;letter-spacing:.08em;padding:7px 16px;border-radius:100px;border:1px solid rgba(251,245,230,0.15);color:var(--cream60);cursor:pointer;transition:all .2s;user-select:none;}
+.fpill:hover{border-color:rgba(251,245,230,0.4);color:var(--cream);}
+.fpill.active{background:var(--green);border-color:var(--green);color:var(--cream);}
+.slider-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.slider-label{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--cream60);}
+.budget-display{display:flex;align-items:baseline;gap:4px;}
+.budget-currency{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:600;color:var(--gold);}
+.budget-value{font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:900;color:var(--gold);line-height:1;}
+.budget-slider{width:100%;height:4px;-webkit-appearance:none;appearance:none;background:rgba(251,245,230,0.1);border-radius:4px;outline:none;cursor:pointer;margin-bottom:12px;}
+.budget-slider::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--gold);cursor:pointer;border:3px solid var(--dark2);box-shadow:0 0 0 2px var(--gold);transition:transform .2s;}
+.budget-slider::-webkit-slider-thumb:hover{transform:scale(1.2);}
+.slider-labels{display:flex;justify-content:space-between;font-size:10px;color:rgba(251,245,230,0.3);margin-bottom:16px;}
+.budget-tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.tier{font-size:9px;letter-spacing:.15em;text-transform:uppercase;text-align:center;padding:5px 0;border-radius:4px;color:rgba(251,245,230,0.2);border:1px solid rgba(251,245,230,0.06);transition:all .3s;}
+.tier.active-tier{color:var(--gold);border-color:rgba(232,168,56,0.4);background:rgba(232,168,56,0.06);}
+.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;}
+.results-meta{font-size:13px;color:var(--cream60);line-height:1.6;}
+.results-meta strong{color:var(--cream);font-weight:500;}
+.results-count{font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.15em;text-transform:uppercase;color:var(--cream60);}
+.dest-results{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;min-height:320px;}
+.res-card{border-radius:16px;overflow:hidden;position:relative;height:360px;cursor:pointer;transition:transform .4s cubic-bezier(0.22,1,0.36,1);}
+.res-card:hover{transform:translateY(-8px);}
+.res-card-img{position:absolute;inset:-8%;background-size:cover;background-position:center;transition:transform .6s cubic-bezier(0.22,1,0.36,1);}
+.res-card:hover .res-card-img{transform:scale(1.06);}
+.res-card-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,26,16,.92) 0%,rgba(15,26,16,.1) 60%);}
+.res-card-badge{position:absolute;top:14px;left:14px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:5px 12px;border-radius:100px;font-weight:500;}
+.badge-budget{background:rgba(45,106,46,0.9);color:var(--cream);}
+.badge-mid{background:rgba(232,168,56,0.9);color:var(--dark);}
+.badge-premium{background:rgba(192,57,43,0.9);color:var(--cream);}
+.badge-luxury{background:rgba(251,245,230,0.15);color:var(--cream);border:1px solid rgba(251,245,230,0.3);}
+.res-card-body{position:absolute;bottom:0;left:0;right:0;padding:22px 20px;}
+.res-card-region{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:rgba(251,245,230,0.55);display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.res-card-region::before{content:'';width:10px;height:1.5px;background:var(--sage);}
+.res-card-name{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;text-transform:uppercase;line-height:1;margin-bottom:10px;}
+.res-card-cost{position:absolute;top:14px;right:14px;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--gold);background:rgba(15,26,16,0.75);padding:5px 10px;border-radius:8px;}
+.res-meta-chip{font-size:10px;color:rgba(251,245,230,0.6);display:flex;align-items:center;gap:5px;margin-bottom:5px;}
+.no-results{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 0;text-align:center;}
+.no-results h3{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;text-transform:uppercase;color:var(--cream);margin-bottom:8px;}
+.no-results p{font-size:13px;color:var(--cream60);}
+.budget-tip{margin-top:32px;padding:20px 28px;background:var(--dark2);border-left:3px solid var(--gold);border-radius:0 12px 12px 0;font-size:13px;color:var(--cream60);line-height:1.7;}
+.budget-tip strong{color:var(--cream);}
+
+/* DEALS SLIDER */
+.deals-section{padding:120px 56px;background:var(--dark2);position:relative;overflow:hidden;}
+.deals-section::before{content:'';position:absolute;bottom:-200px;left:-200px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(192,57,43,0.07) 0%,transparent 70%);pointer-events:none;}
+.deals-top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:52px;gap:24px;}
+.deals-desc{max-width:300px;font-size:13px;color:var(--cream60);line-height:1.75;font-weight:300;margin-top:16px;}
+.deals-controls{display:flex;flex-direction:column;align-items:flex-end;gap:16px;flex-shrink:0;}
+.deals-pips{display:flex;gap:6px;align-items:center;}
+.deals-pip{width:8px;height:8px;border-radius:50%;background:rgba(251,245,230,0.15);cursor:pointer;transition:all .35s cubic-bezier(0.22,1,0.36,1);border:none;outline:none;}
+.deals-pip.active{width:28px;border-radius:4px;background:var(--gold);}
+.deals-arrows{display:flex;gap:10px;}
+.deals-arrow{width:46px;height:46px;border-radius:50%;border:1px solid rgba(251,245,230,0.2);background:rgba(251,245,230,0.04);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s,border-color .2s,transform .15s;flex-shrink:0;}
+.deals-arrow:hover{background:var(--red);border-color:var(--red);}
+.deals-arrow:active{transform:scale(.9);}
+.deals-arrow svg{width:16px;height:16px;stroke:var(--cream);fill:none;stroke-width:2;pointer-events:none;}
+.deals-viewport{overflow:hidden;border-radius:20px;}
+.deals-track{display:flex;gap:20px;transition:transform .75s cubic-bezier(0.77,0,0.18,1);will-change:transform;}
+.deal-card{flex:0 0 calc(33.333% - 14px);border-radius:20px;overflow:hidden;background:var(--dark);border:1px solid rgba(251,245,230,0.07);display:flex;flex-direction:column;transition:border-color .3s,transform .4s cubic-bezier(0.22,1,0.36,1);}
+.deal-card:hover{border-color:rgba(232,168,56,0.3);transform:translateY(-6px);}
+.deal-img-wrap{position:relative;height:230px;overflow:hidden;flex-shrink:0;}
+.deal-img{position:absolute;inset:-8%;background-size:cover;background-position:center;transition:transform .7s cubic-bezier(0.22,1,0.36,1);}
+.deal-card:hover .deal-img{transform:scale(1.07);}
+.deal-img-ov{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(15,26,16,0.08) 0%,rgba(15,26,16,0.6) 100%);}
+.deal-badges{position:absolute;top:14px;left:14px;display:flex;gap:6px;z-index:2;}
+.deal-badge{font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:5px 11px;border-radius:100px;font-weight:600;}
+.badge-hot{background:var(--red);color:var(--cream);}
+.badge-new{background:var(--green);color:var(--cream);}
+.badge-deal{background:var(--gold);color:var(--dark);}
+.deal-disc{position:absolute;top:14px;right:14px;z-index:2;background:rgba(232,168,56,0.95);color:var(--dark);font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;padding:5px 10px;border-radius:8px;line-height:1;}
+.deal-body{padding:22px 22px 20px;flex:1;display:flex;flex-direction:column;}
+.deal-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.deal-region{font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(251,245,230,0.4);display:flex;align-items:center;gap:6px;}
+.deal-region::before{content:'';width:10px;height:1.5px;background:var(--sage);flex-shrink:0;}
+.deal-rating{font-size:11px;color:var(--gold);display:flex;align-items:center;gap:3px;}
+.deal-rating span{color:rgba(251,245,230,0.35);font-size:10px;}
+.deal-title{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;text-transform:uppercase;line-height:1;margin-bottom:6px;color:var(--cream);}
+.deal-dur{font-size:10px;letter-spacing:.1em;color:rgba(251,245,230,0.4);text-transform:uppercase;margin-bottom:10px;}
+.deal-desc{font-size:12px;color:rgba(251,245,230,0.48);line-height:1.65;font-weight:300;margin-bottom:14px;flex:1;}
+.deal-chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px;}
+.deal-chip{font-size:9.5px;color:rgba(251,245,230,0.5);background:rgba(251,245,230,0.04);border:1px solid rgba(251,245,230,0.08);padding:4px 10px;border-radius:6px;}
+.deal-timer{display:flex;align-items:center;gap:7px;margin-bottom:12px;}
+.deal-timer-lbl{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(251,245,230,0.3);}
+.timer-boxes{display:flex;gap:4px;align-items:center;}
+.tbox{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--gold);background:rgba(232,168,56,0.1);border:1px solid rgba(232,168,56,0.2);padding:3px 7px;border-radius:5px;min-width:28px;text-align:center;}
+.tsep{font-size:11px;color:rgba(232,168,56,0.4);font-weight:700;}
+.deal-footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(251,245,230,0.07);padding-top:16px;margin-top:auto;}
+.deal-was{font-size:10px;color:rgba(251,245,230,0.28);text-decoration:line-through;margin-bottom:1px;}
+.deal-price{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;color:var(--gold);line-height:1;}
+.deal-per{font-size:9px;color:rgba(251,245,230,0.3);margin-top:2px;}
+.deal-btn{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--cream);border:1px solid rgba(251,245,230,0.22);padding:11px 20px;border-radius:100px;cursor:pointer;background:none;transition:background .2s,border-color .2s,transform .15s;white-space:nowrap;}
+.deal-btn:hover{background:var(--red);border-color:var(--red);transform:scale(1.04);}
+
+/* MARQUEE */
+.marquee-wrap{padding:36px 0;background:var(--red);overflow:hidden;white-space:nowrap;}
+.marquee-track{display:inline-flex;gap:48px;animation:marquee 20s linear infinite;}
+.marquee-item{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--cream);display:flex;align-items:center;gap:48px;flex-shrink:0;}
+.marquee-dot{width:6px;height:6px;border-radius:50%;background:var(--cream);opacity:.35;}
+@keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* CTA */
+.cta-section{height:70vh;min-height:480px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.cta-bg{position:absolute;inset:-10%;background-size:cover;background-position:center;will-change:transform;}
+.cta-ov{position:absolute;inset:0;background:rgba(15,26,16,0.65);}
+.cta-content{position:relative;z-index:2;text-align:center;max-width:620px;padding:0 24px;}
+.cta-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(48px,7vw,84px);font-weight:900;text-transform:uppercase;line-height:.9;margin-bottom:24px;}
+.cta-title em{color:var(--sage);font-style:normal;}
+.cta-sub{font-size:14px;color:var(--cream60);line-height:1.7;margin-bottom:36px;}
+
+/* FOOTER */
+footer{background:var(--dark);padding:72px 56px 36px;border-top:1px solid rgba(192,57,43,0.15);}
+.footer-top{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px;margin-bottom:64px;}
+.footer-logo{display:flex;align-items:center;gap:10px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.22em;font-weight:700;text-transform:uppercase;text-decoration:none;color:var(--cream);margin-bottom:18px;}
+.footer-logo svg{width:20px;height:20px;stroke:var(--cream);fill:none;stroke-width:1.5;}
+.footer-tagline{font-size:13px;color:var(--cream60);line-height:1.7;font-weight:300;max-width:220px;}
+.footer-col h4{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--sage);font-weight:500;margin-bottom:18px;}
+.footer-col ul{list-style:none;}
+.footer-col ul li{margin-bottom:10px;}
+.footer-col ul a{font-size:13px;color:var(--cream60);text-decoration:none;transition:color .2s;}
+.footer-col ul a:hover{color:var(--cream);}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:36px;border-top:1px solid rgba(192,57,43,0.12);font-size:11px;color:rgba(251,245,230,0.25);}
+.social-links{display:flex;gap:16px;}
+.social-links a{width:36px;height:36px;border-radius:50%;border:1px solid rgba(168,201,122,0.15);display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--cream60);font-size:11px;transition:border-color .2s,color .2s,background .2s;}
+.social-links a:hover{border-color:var(--gold);color:var(--gold);background:rgba(232,168,56,0.08);}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<div class="loader" id="loader">
+  <div class="loader-symbol">YATRA<span>.</span></div>
+  <div class="loader-tagline">Discover Incredible India</div>
+  <div class="loader-bar-wrap"><div class="loader-bar" id="loaderBar"></div></div>
+  <div class="loader-num" id="loaderNum">0%</div>
+</div>
+
+<nav class="nav" id="mainNav">
+  <a href="#" class="nav-logo">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="4" ry="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+    Yatra Express
+  </a>
+  <ul class="nav-links">
+    <li><a href="/" class="active">Home</a></li>
+    <li><a href="taj-mahal.html">VR Experience</a></li>
+    <li><a href="about-us.html">About US</a></li>
+    <!-- <li><a href="budget.html">Plan Trip</a></li> -->
+    <li><a href="deals.html">Deals</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <div class="nav-actions">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-bg-wrap">
+    <div class="hero-bg" id="heroBgA"></div>
+    <div class="hero-bg" id="heroBgB" style="opacity:0;"></div>
+  </div>
+  <div class="hero-overlay"></div><div class="hero-overlay2"></div>
+  <div class="hero-content" id="heroContent">
+    <div class="hero-eyebrow" id="hEye">Uttar Pradesh · India</div>
+    <div class="hero-title" id="hTitle">TAJ<br>MAHAL</div>
+    <div class="hero-desc" id="hDesc">An eternal monument of love rising in ivory white marble — the crown jewel of Mughal architecture and India most iconic landmark.</div>
+    <div class="hero-actions">
+      <button class="btn-green">Explore Destination</button>
+      <button class="btn-ghost">View Gallery</button>
+    </div>
+  </div>
+  <div class="hero-cards" id="heroCards"></div>
+  <div class="scroll-indicator"><div class="scroll-line"></div><div class="scroll-text">Scroll</div></div>
+  <div class="hero-bar">
+    <div class="nav-circles">
+      <div class="nc" id="prevBtn"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+      <div class="nc" id="nextBtn"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+    <div class="slide-num" id="slideNum">01</div>
+  </div>
+  <div class="morph-card" id="morphCard"><div class="morph-card-img" id="morphImg"></div></div>
+</section>
+
+<!-- FEATURED -->
+<section class="featured" id="featured">
+  <div class="featured-header">
+    <div>
+      <div class="section-label">Top Picks</div>
+      <div class="featured-title">Featured<br>Destinations</div>
+    </div>
+    <div class="featured-desc">Handpicked by our India travel experts — destinations that capture the soul of this extraordinary subcontinent.</div>
+  </div>
+  <div class="dest-grid">
+    <div class="dest-item"><div class="dest-item-bg" style="background-image:url('https://images.unsplash.com/photo-1548013146-72479768bada?w=900&q=80')"></div><div class="dest-item-ov"></div><div class="dest-item-body"><div class="dest-item-region">Uttar Pradesh · North India</div><div class="dest-item-name">Taj Mahal<br>Agra</div><div class="dest-item-tag">Heritage · UNESCO</div></div></div>
+    <div class="dest-item"><div class="dest-item-bg" style="background-image:url('https://images.unsplash.com/photo-1477587458883-47145ed94245?w=700&q=80')"></div><div class="dest-item-ov"></div><div class="dest-item-body"><div class="dest-item-region">Rajasthan · West India</div><div class="dest-item-name">Jaipur<br>Pink City</div><div class="dest-item-tag">Royalty · Culture</div></div></div>
+    <div class="dest-item"><div class="dest-item-bg" style="background-image:url('https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=700&q=80')"></div><div class="dest-item-ov"></div><div class="dest-item-body"><div class="dest-item-region">Kerala · South India</div><div class="dest-item-name">Kerala<br>Backwaters</div><div class="dest-item-tag">Nature · Serene</div></div></div>
+    <div class="dest-item"><div class="dest-item-bg" style="background-image:url('https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=700&q=80')"></div><div class="dest-item-ov"></div><div class="dest-item-body"><div class="dest-item-region">Uttar Pradesh · North India</div><div class="dest-item-name">Varanasi<br>Ghats</div><div class="dest-item-tag">Spiritual · Sacred</div></div></div>
+    <div class="dest-item"><div class="dest-item-bg" style="background-image:url('https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=700&q=80')"></div><div class="dest-item-ov"></div><div class="dest-item-body"><div class="dest-item-region">Himachal Pradesh · North</div><div class="dest-item-name">Spiti<br>Valley</div><div class="dest-item-tag">Mountains · Adventure</div></div></div>
+  </div>
+</section>
+
+<!-- POPULAR ROUTES -->
+<section class="hscroll-section" id="routes">
+  <div class="hscroll-label">
+    <div class="section-label">Explore More</div>
+    <div class="featured-title">Popular<br>Routes</div>
+  </div>
+  <div class="hscroll-track-wrap">
+    <div class="hscroll-track" id="hscrollTrack">
+      <div class="hs-card"><div class="hs-card-img" style="background-image:url('https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=500&q=80')"></div><div class="hs-card-ov"></div><div class="hs-card-body"><div class="hs-card-region">Kerala · South India</div><div class="hs-card-name">Kerala<br>Backwaters</div></div></div>
+      <div class="hs-card"><div class="hs-card-img" style="background-image:url('https://images.unsplash.com/photo-1587474260584-136574528ed5?w=500&q=80')"></div><div class="hs-card-ov"></div><div class="hs-card-body"><div class="hs-card-region">Maharashtra · West</div><div class="hs-card-name">Mumbai<br>Coastline</div></div></div>
+      <div class="hs-card"><div class="hs-card-img" style="background-image:url('https://images.unsplash.com/photo-1598091383021-15ddea10925d?w=500&q=80')"></div><div class="hs-card-ov"></div><div class="hs-card-body"><div class="hs-card-region">Goa · West Coast</div><div class="hs-card-name">Goa<br>Beaches</div></div></div>
+      <div class="hs-card"><div class="hs-card-img" style="background-image:url('https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=500&q=80')"></div><div class="hs-card-ov"></div><div class="hs-card-body"><div class="hs-card-region">Karnataka · South</div><div class="hs-card-name">Hampi<br>Ruins</div></div></div>
+      <div class="hs-card"><div class="hs-card-img" style="background-image:url('https://images.unsplash.com/photo-1625048490406-2571e49fa2cf?w=500&q=80')"></div><div class="hs-card-ov"></div><div class="hs-card-body"><div class="hs-card-region">Uttarakhand · North</div><div class="hs-card-name">Rishikesh<br>Ganges</div></div></div>
+      <div class="hs-card"><div class="hs-card-img" style="background-image:url('https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=500&q=80')"></div><div class="hs-card-ov"></div><div class="hs-card-body"><div class="hs-card-region">Northeast · India</div><div class="hs-card-name">Meghalaya<br>Caves</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- BUDGET PLANNER -->
+<section class="budget-section" id="budget">
+  <div class="budget-inner">
+    <div class="section-label">Smart Travel Planner</div>
+    <div class="featured-title">Plan by<br>Your Budget</div>
+    <p class="budget-subtitle">Drag the slider to set your total trip budget and we will suggest the best Indian destinations tailored for you.</p>
+    <div class="budget-controls">
+      <div class="budget-filters">
+        <div class="filter-group">
+          <div class="filter-label">Trip Duration</div>
+          <div class="filter-pills" id="durationFilter">
+            <div class="fpill active" data-dur="weekend">Weekend</div>
+            <div class="fpill" data-dur="week">1 Week</div>
+            <div class="fpill" data-dur="twoweek">2 Weeks</div>
+            <div class="fpill" data-dur="month">1 Month</div>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Travel Style</div>
+          <div class="filter-pills" id="styleFilter">
+            <div class="fpill active" data-style="all">All</div>
+            <div class="fpill" data-style="adventure">Adventure</div>
+            <div class="fpill" data-style="culture">Culture</div>
+            <div class="fpill" data-style="nature">Nature</div>
+            <div class="fpill" data-style="spiritual">Spiritual</div>
+            <div class="fpill" data-style="beach">Beach</div>
+          </div>
+        </div>
+      </div>
+      <div class="slider-top">
+        <span class="slider-label">Your Total Budget</span>
+        <div class="budget-display"><span class="budget-currency">&#8377;</span><span class="budget-value" id="budgetDisplay">25,000</span></div>
+      </div>
+      <input type="range" id="budgetSlider" min="5000" max="300000" value="25000" step="1000" class="budget-slider">
+      <div class="slider-labels"><span>&#8377;5K</span><span>&#8377;50K</span><span>&#8377;1L</span><span>&#8377;2L</span><span>&#8377;3L+</span></div>
+      <div class="budget-tiers">
+        <div class="tier active-tier" id="tier-budget">Budget</div>
+        <div class="tier" id="tier-mid">Mid-Range</div>
+        <div class="tier" id="tier-premium">Premium</div>
+        <div class="tier" id="tier-luxury">Luxury</div>
+      </div>
+    </div>
+    <div class="results-header"><div class="results-meta" id="resultsMeta"></div><div class="results-count" id="resultsCount"></div></div>
+    <div class="dest-results" id="destResults"></div>
+    <div class="budget-tip" id="budgetTip"></div>
+  </div>
+</section>
+
+<!-- DEALS SLIDER -->
+<section class="deals-section" id="deals">
+  <div class="deals-top">
+    <div>
+      <div class="section-label">Limited Time Offers</div>
+      <div class="featured-title">Best Tours &<br>Trip Deals</div>
+      <p class="deals-desc">Handpicked packages at unbeatable prices — curated for every kind of Indian traveller.</p>
+    </div>
+    <div class="deals-controls">
+      <div class="deals-pips" id="dealsPips"></div>
+      <div class="deals-arrows">
+        <div class="deals-arrow" id="dealsPrev"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="deals-arrow" id="dealsNext"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+      </div>
+    </div>
+  </div>
+  <div class="deals-viewport">
+    <div class="deals-track" id="dealsTrack"></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item">Rajasthan <span class="marquee-dot"></span> Kerala <span class="marquee-dot"></span> Ladakh <span class="marquee-dot"></span> Varanasi <span class="marquee-dot"></span> Goa <span class="marquee-dot"></span> Himalayas <span class="marquee-dot"></span> Yatra Express <span class="marquee-dot"></span></div>
+    <div class="marquee-item">Rajasthan <span class="marquee-dot"></span> Kerala <span class="marquee-dot"></span> Ladakh <span class="marquee-dot"></span> Varanasi <span class="marquee-dot"></span> Goa <span class="marquee-dot"></span> Himalayas <span class="marquee-dot"></span> Yatra Express <span class="marquee-dot"></span></div>
+  </div>
+</div>
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+  <div class="cta-bg" id="ctaBg" style="background-image:url('https://www.airpano.com/photogallery/images_1550/14_905499.jpg')"></div>
+  <div class="cta-ov"></div>
+  <div class="cta-content">
+    <div class="section-label" style="justify-content:center;">Get In Touch</div>
+    <div class="cta-title">Let us Plan Your <em>Perfect</em> Indian Journey</div>
+    <div class="cta-sub">Our India travel specialists are ready to craft a personalised yatra — your pace, your passions, your India.</div>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-green">Book a Consultation</button>
+      <button class="btn-ghost">Browse Packages</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="4" ry="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>Yatra Express</div>
+      <div class="footer-tagline">Curating extraordinary journeys across Incredible India since 2013.</div>
+    </div>
+    <div class="footer-col"><h4>Destinations</h4><ul><li><a href="#">Rajasthan</a></li><li><a href="#">Kerala</a></li><li><a href="#">Ladakh</a></li><li><a href="#">Himachal Pradesh</a></li><li><a href="#">Goa &amp; Konkan</a></li></ul></div>
+    <div class="footer-col"><h4>Company</h4><ul><li><a href="#">About Us</a></li><li><a href="#">Our Team</a></li><li><a href="#">Careers</a></li><li><a href="#">Press</a></li><li><a href="#">Partners</a></li></ul></div>
+    <div class="footer-col"><h4>Support</h4><ul><li><a href="#">FAQ</a></li><li><a href="#">Travel Insurance</a></li><li><a href="#">Visa Assistance</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Accessibility</a></li></ul></div>
+  </div>
+  <div class="footer-bottom">
+    <div>&copy; 2025 Yatra Express. All rights reserved.</div>
+    <div class="social-links"><a href="#">Ig</a><a href="#">Tw</a><a href="#">Fb</a><a href="#">Yt</a></div>
+  </div>
+</footer>
+
+<script>
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+/* CURSOR */
+const cursor=document.getElementById('cursor'),cursorRing=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+window.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+gsap.ticker.add(()=>{rx+=(mx-rx)*.12;ry+=(my-ry)*.12;gsap.set(cursor,{x:mx,y:my});gsap.set(cursorRing,{x:rx,y:ry});});
+
+/* LOADER */
+gsap.to('#loaderBar',{width:'100%',duration:1.8,ease:'power2.inOut',
+  onUpdate:function(){document.getElementById('loaderNum').textContent=Math.round(this.progress()*100)+'%';},
+  onComplete:()=>{
+    gsap.to('#loader',{yPercent:-100,duration:.9,ease:'power3.inOut',delay:.2,
+      onComplete:()=>{document.getElementById('loader').style.display='none';initHero();runAnims();}
+    });
+  }
+});
+
+/* NAV */
+ScrollTrigger.create({start:'top -60px',onUpdate:s=>document.getElementById('mainNav').classList.toggle('scrolled',s.progress>0)});
+
+/* HERO SLIDES */
+const SLIDES=[
+  {region:'Uttar Pradesh · North India',title:'TAJ\nMAHAL',img:'https://images.unsplash.com/photo-1548013146-72479768bada?w=1400&q=85',desc:'An eternal monument of love rising in ivory white marble — the crown jewel of Mughal architecture and India most iconic landmark.'},
+  {region:'Rajasthan · West India',title:'JAIPUR\nPINK CITY',img:'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=1400&q=85',desc:'The Pink City of maharajas — where amber forts, havelis, and bazaars alive with colour tell stories of a royal past.'},
+  {region:'Kerala · South India',title:'KERALA\nBACKWATERS',img:'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1400&q=85',desc:'Drift through emerald waterways on a private houseboat, flanked by swaying coconut palms in God own country.'},
+  {region:'Kerala · South India',title:'KERALA\nBACKWATERS',img:'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1400&q=85',desc:'Drift through emerald waterways on a private houseboat, flanked by swaying coconut palms in God own country.'},
+  {region:'Uttar Pradesh · Spiritual India',title:'VARANASI\nGHATS',img:'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1400&q=85',desc:'One of the world oldest living cities — where ancient rituals, sacred fires, and the holy Ganges converge at dawn.'},
+  {region:'Himachal Pradesh · North India',title:'SPITI\nVALLEY',img:'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=1400&q=85',desc:'A cold desert mountain valley of dramatic silence — ancient monasteries, turquoise rivers, and star-filled skies.'}
+];
+
+let cur=0,busy=false,autoT=null,progRaf=null,progStart=null,activeLayer='a';
+const AUTO=5500;
+const heroBgA=document.getElementById('heroBgA'),heroBgB=document.getElementById('heroBgB');
+const heroContent=document.getElementById('heroContent');
+const hEye=document.getElementById('hEye'),hTitle=document.getElementById('hTitle'),hDesc=document.getElementById('hDesc');
+const heroCards=document.getElementById('heroCards');
+const morph=document.getElementById('morphCard'),morphImg=document.getElementById('morphImg');
+const progFill=document.getElementById('progFill'),slideNum=document.getElementById('slideNum');
+const heroEl=document.getElementById('hero');
+
+function pad(n){return String(n+1).padStart(2,'0');}
+function setBg(l,i){(l==='a'?heroBgA:heroBgB).style.backgroundImage=`url('${SLIDES[i].img}')`;}
+function updateText(i){hEye.textContent=SLIDES[i].region;hTitle.innerHTML=SLIDES[i].title.replace('\n','<br>');hDesc.textContent=SLIDES[i].desc;}
+
+function buildCards(){
+  heroCards.innerHTML='';
+  for(let i=0;i<4;i++){
+    const idx=(cur+1+i)%SLIDES.length,d=SLIDES[idx],c=document.createElement('div');
+    c.className='h-card';c.dataset.slide=idx;
+    c.innerHTML=`<div class="h-card-img" style="background-image:url('${d.img}')"></div><div class="h-card-ov"></div><div class="h-card-body"><div class="h-card-region">${d.region}</div><div class="h-card-name">${d.title.replace('\n','<br>')}</div></div>`;
+    c.addEventListener('click',function(){triggerMorph(parseInt(this.dataset.slide),this);});
+    heroCards.appendChild(c);
+  }
+  gsap.fromTo(heroCards.children,{y:24,opacity:0},{y:0,opacity:1,duration:.6,stagger:.08,ease:'power3.out'});
+}
+
+function triggerMorph(nextIdx,cardEl){
+  if(busy||nextIdx===cur)return;
+  busy=true;stopAuto();
+  const geR=heroEl.getBoundingClientRect(),cR=cardEl.getBoundingClientRect();
+  morphImg.style.backgroundImage=`url('${SLIDES[nextIdx].img}')`;
+  gsap.set(morph,{left:cR.left-geR.left,top:cR.top-geR.top,width:cR.width,height:cR.height,borderRadius:14,opacity:1});
+  gsap.to([hEye,hTitle,hDesc],{y:-20,opacity:0,duration:.35,stagger:.04,ease:'power2.in'});
+  gsap.to(heroContent.querySelectorAll('.hero-actions'),{opacity:0,duration:.25});
+  gsap.to(morph,{left:0,top:0,width:heroEl.offsetWidth,height:heroEl.offsetHeight,borderRadius:0,duration:.88,ease:'power3.inOut'});
+  setTimeout(()=>{
+    cur=nextIdx;slideNum.textContent=pad(cur);
+    if(activeLayer==='a'){setBg('b',cur);heroBgB.style.opacity='1';heroBgA.style.opacity='0';activeLayer='b';}
+    else{setBg('a',cur);heroBgA.style.opacity='1';heroBgB.style.opacity='0';activeLayer='a';}
+    updateText(cur);buildCards();
+    gsap.to(morph,{opacity:0,duration:.4});
+    gsap.fromTo([hEye,hTitle],{y:32,opacity:0},{y:0,opacity:1,duration:.65,stagger:.08,ease:'power3.out',delay:.05});
+    gsap.fromTo([hDesc,heroContent.querySelector('.hero-actions')],{y:18,opacity:0},{y:0,opacity:1,duration:.55,stagger:.07,ease:'power3.out',delay:.2});
+    setTimeout(()=>{busy=false;startAuto();},420);
+  },720);
+}
+
+function goNext(){if(busy)return;const fc=heroCards.children[0];if(fc)triggerMorph((cur+1)%SLIDES.length,fc);}
+function goPrev(){
+  if(busy)return;const prevIdx=(cur-1+SLIDES.length)%SLIDES.length;
+  busy=true;stopAuto();
+  gsap.to([hEye,hTitle,hDesc],{y:20,opacity:0,duration:.35,stagger:.04,ease:'power2.in'});
+  const tl=gsap.timeline();
+  if(activeLayer==='a'){setBg('b',prevIdx);tl.to(heroBgA,{opacity:0,duration:.7},0).to(heroBgB,{opacity:1,duration:.7},0);activeLayer='b';}
+  else{setBg('a',prevIdx);tl.to(heroBgB,{opacity:0,duration:.7},0).to(heroBgA,{opacity:1,duration:.7},0);activeLayer='a';}
+  setTimeout(()=>{cur=prevIdx;slideNum.textContent=pad(cur);updateText(cur);buildCards();
+    gsap.fromTo([hEye,hTitle],{y:-28,opacity:0},{y:0,opacity:1,duration:.65,stagger:.08,ease:'power3.out'});
+    gsap.fromTo([hDesc,heroContent.querySelector('.hero-actions')],{opacity:0},{y:0,opacity:1,duration:.55,stagger:.07,ease:'power3.out',delay:.15});
+    setTimeout(()=>{busy=false;startAuto();},400);
+  },400);
+}
+
+function startProgress(){cancelAnimationFrame(progRaf);gsap.set(progFill,{width:'0%'});progStart=performance.now();
+  (function tick(now){const p=Math.min(((now-progStart)/AUTO)*100,100);gsap.set(progFill,{width:p+'%'});if(p<100)progRaf=requestAnimationFrame(tick);})(performance.now());}
+function stopProgress(){cancelAnimationFrame(progRaf);gsap.set(progFill,{width:'0%'});}
+function startAuto(){stopProgress();startProgress();autoT=setTimeout(goNext,AUTO);}
+function stopAuto(){clearTimeout(autoT);stopProgress();}
+
+document.getElementById('nextBtn').addEventListener('click',goNext);
+document.getElementById('prevBtn').addEventListener('click',goPrev);
+
+heroEl.addEventListener('mousemove',e=>{
+  const r=heroEl.getBoundingClientRect(),xP=(e.clientX-r.left)/r.width-.5,yP=(e.clientY-r.top)/r.height-.5;
+  gsap.to(activeLayer==='a'?heroBgA:heroBgB,{x:xP*28,y:yP*14,duration:1.2,ease:'power2.out'});
+});
+heroEl.addEventListener('mouseleave',()=>gsap.to([heroBgA,heroBgB],{x:0,y:0,duration:1.4,ease:'power2.out'}));
+
+let tx=null;
+heroEl.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+heroEl.addEventListener('touchend',e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?goNext():goPrev();tx=null;},{passive:true});
+
+function initHero(){setBg('a',0);updateText(0);buildCards();slideNum.textContent='01';startAuto();}
+
+/* BUDGET PLANNER */
+const PLACES=[
+  {name:'Rishikesh',region:'Uttarakhand',img:'https://images.unsplash.com/photo-1625048490406-2571e49fa2cf?w=600&q=80',minBudget:5000,maxBudget:25000,style:['adventure','spiritual'],duration:['weekend','week'],days:'2-4 days',tier:'budget',cost:'Rs 5K-15K',desc:'Yoga, river rafting, and Ganga Aarti on a shoestring.'},
+  {name:'Mcleod Ganj',region:'Himachal Pradesh',img:'https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=600&q=80',minBudget:6000,maxBudget:22000,style:['culture','spiritual','nature'],duration:['weekend','week'],days:'3-5 days',tier:'budget',cost:'Rs 6K-18K',desc:'Little Tibet — Tibetan culture, monastery treks, and cheap cafes.'},
+  {name:'Hampi',region:'Karnataka',img:'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=600&q=80',minBudget:7000,maxBudget:28000,style:['culture','adventure'],duration:['weekend','week'],days:'3-5 days',tier:'budget',cost:'Rs 7K-20K',desc:'UNESCO ruins, boulder landscapes, and backpacker culture.'},
+  {name:'Varanasi',region:'Uttar Pradesh',img:'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=600&q=80',minBudget:8000,maxBudget:35000,style:['spiritual','culture'],duration:['weekend','week'],days:'3-5 days',tier:'budget',cost:'Rs 8K-25K',desc:'Sacred ghats, dawn boat rides, and age-old rituals at dusk.'},
+  {name:'Goa',region:'Goa',img:'https://images.unsplash.com/photo-1598091383021-15ddea10925d?w=600&q=80',minBudget:10000,maxBudget:80000,style:['beach','adventure','culture'],duration:['weekend','week','twoweek'],days:'4-10 days',tier:'mid',cost:'Rs 10K-60K',desc:'Beach parties, Portuguese heritage, seafood, and stunning sunsets.'},
+  {name:'Jaipur',region:'Rajasthan',img:'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=600&q=80',minBudget:12000,maxBudget:90000,style:['culture','adventure'],duration:['weekend','week','twoweek'],days:'3-6 days',tier:'mid',cost:'Rs 12K-60K',desc:'Pink City of palaces, bazaars, and Rajput grandeur.'},
+  {name:'Kerala Backwaters',region:'Kerala',img:'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=600&q=80',minBudget:15000,maxBudget:100000,style:['nature','culture','beach'],duration:['week','twoweek'],days:'5-10 days',tier:'mid',cost:'Rs 15K-80K',desc:'Houseboat through palm-fringed waterways in God own country.'},
+  {name:'Spiti Valley',region:'Himachal Pradesh',img:'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=600&q=80',minBudget:20000,maxBudget:70000,style:['adventure','nature'],duration:['week','twoweek'],days:'7-14 days',tier:'mid',cost:'Rs 20K-65K',desc:'Remote Himalayan desert — ancient monasteries and alien landscapes.'},
+  {name:'Andaman Islands',region:'Andaman',img:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80',minBudget:30000,maxBudget:120000,style:['beach','adventure','nature'],duration:['week','twoweek'],days:'6-10 days',tier:'premium',cost:'Rs 30K-1L',desc:'Crystal-clear waters, pristine beaches, snorkelling and scuba diving.'},
+  {name:'Ladakh',region:'Jammu and Kashmir',img:'https://images.unsplash.com/photo-1609340540563-28e354d32a2e?w=600&q=80',minBudget:35000,maxBudget:150000,style:['adventure','nature','spiritual'],duration:['week','twoweek','month'],days:'8-15 days',tier:'premium',cost:'Rs 35K-1.2L',desc:'Pangong Lake, Nubra Valley, high mountain passes and monasteries.'},
+  {name:'Ranthambore',region:'Rajasthan',img:'https://images.unsplash.com/photo-1559494007-9f5847c49d94?w=600&q=80',minBudget:25000,maxBudget:110000,style:['adventure','nature'],duration:['weekend','week'],days:'3-5 days',tier:'premium',cost:'Rs 25K-90K',desc:'Tiger safari in one of India finest national parks.'},
+  {name:'Udaipur',region:'Rajasthan',img:'https://images.unsplash.com/photo-1570939274717-7eda259b50ed?w=600&q=80',minBudget:30000,maxBudget:200000,style:['culture','adventure'],duration:['week','twoweek'],days:'4-7 days',tier:'premium',cost:'Rs 30K-1.5L',desc:'City of Lakes — romantic palace hotels, boat rides, and Rajput heritage.'},
+  {name:'Lakshadweep',region:'Lakshadweep Islands',img:'https://images.unsplash.com/photo-1545987796-200677ee1011?w=600&q=80',minBudget:100000,maxBudget:400000,style:['beach','nature'],duration:['week','twoweek'],days:'5-8 days',tier:'luxury',cost:'Rs 1L-4L',desc:'Pristine coral atolls, transparent lagoons, and exclusive island resorts.'},
+  {name:'Palace on Wheels',region:'Rajasthan Luxury Train',img:'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?w=600&q=80',minBudget:150000,maxBudget:500000,style:['culture','adventure'],duration:['week'],days:'7 nights',tier:'luxury',cost:'Rs 1.5L-5L',desc:'India most iconic luxury train through the royal heartland of Rajasthan.'}
+];
+
+const TIPS={
+  budget:'<strong>Budget Travel Tip:</strong> Book trains 60-90 days in advance via IRCTC. Choose HPTDC or PTDC guesthouses for quality stays at half the hotel price. Eat at local dhabas — always authentic, always under Rs 100.',
+  mid:'<strong>Mid-Range Sweet Spot:</strong> India best value. Stay in boutique heritage properties, hire private drivers, and enjoy home-cooked meals. Shoulder season (Sept-Nov, Feb-Apr) gives you 30-40% off.',
+  premium:'<strong>Premium Experience:</strong> Access India incredible palace hotels — former royal residences converted to 5-stars. Consider the Golden Triangle with a private guide for unmatched depth.',
+  luxury:'<strong>Luxury Travel:</strong> Amanbagh, The Oberoi Udaivilas, SUJAN Sher Bagh — these properties offer curated experiences. Consider chartered flights between destinations for a seamless journey.'
+};
+
+let bBudget=25000,bDur='weekend',bStyle='all';
+
+function getTier(b){return b<=25000?'budget':b<=75000?'mid':b<=175000?'premium':'luxury';}
+function updateTierUI(t){document.querySelectorAll('.tier').forEach(el=>el.classList.remove('active-tier'));const m={budget:'tier-budget',mid:'tier-mid',premium:'tier-premium',luxury:'tier-luxury'};const el=document.getElementById(m[t]);if(el)el.classList.add('active-tier');}
+function fmtBudget(v){if(v>=100000)return(v/100000).toFixed(1).replace(/\.0$/,'')+'L';return(v/1000).toFixed(0)+',000';}
+
+function renderBudget(){
+  const filtered=PLACES.filter(p=>{
+    return bBudget>=p.minBudget&&bBudget<=p.maxBudget*1.5&&p.duration.includes(bDur)&&(bStyle==='all'||p.style.includes(bStyle));
+  }).slice(0,6);
+  const tier=getTier(bBudget);
+  const tLabel={budget:'Budget',mid:'Mid-Range',premium:'Premium',luxury:'Luxury'}[tier];
+  updateTierUI(tier);
+  document.getElementById('resultsMeta').innerHTML=`Showing <strong>${filtered.length}</strong> destinations for <strong>${tLabel}</strong> travel · <strong>&#8377;${fmtBudget(bBudget)}</strong> budget`;
+  document.getElementById('resultsCount').textContent=filtered.length+' Results';
+  document.getElementById('budgetTip').innerHTML=TIPS[tier];
+  const res=document.getElementById('destResults');
+  if(!filtered.length){res.innerHTML='<div class="no-results"><h3>No Matches Found</h3><p>Try adjusting your duration or style filter.</p></div>';return;}
+  const bMap={budget:'badge-budget',mid:'badge-mid',premium:'badge-premium',luxury:'badge-luxury'};
+  res.innerHTML=filtered.map(p=>`
+    <div class="res-card">
+      <div class="res-card-img" style="background-image:url('${p.img}')"></div>
+      <div class="res-card-ov"></div>
+      <div class="res-card-badge ${bMap[p.tier]}">${p.tier==='mid'?'Mid-Range':p.tier.charAt(0).toUpperCase()+p.tier.slice(1)}</div>
+      <div class="res-card-cost">${p.cost}</div>
+      <div class="res-card-body">
+        <div class="res-card-region">${p.region}</div>
+        <div class="res-card-name">${p.name}</div>
+        <div class="res-meta-chip">${p.days} · ${p.desc.substring(0,60)}...</div>
+      </div>
+    </div>`).join('');
+  gsap.fromTo(res.querySelectorAll('.res-card'),{y:40,opacity:0},{y:0,opacity:1,duration:.6,stagger:.08,ease:'power3.out'});
+}
+
+document.getElementById('budgetSlider').addEventListener('input',function(){
+  bBudget=parseInt(this.value);
+  document.getElementById('budgetDisplay').textContent=bBudget.toLocaleString('en-IN');
+  const pct=(bBudget-5000)/(300000-5000)*100;
+  this.style.background=`linear-gradient(to right,#E8A838 ${pct}%,rgba(251,245,230,0.1) ${pct}%)`;
+  renderBudget();
+});
+
+document.getElementById('durationFilter').addEventListener('click',function(e){
+  const p=e.target.closest('.fpill');if(!p)return;
+  this.querySelectorAll('.fpill').forEach(x=>x.classList.remove('active'));p.classList.add('active');
+  bDur=p.dataset.dur;renderBudget();
+});
+
+document.getElementById('styleFilter').addEventListener('click',function(e){
+  const p=e.target.closest('.fpill');if(!p)return;
+  this.querySelectorAll('.fpill').forEach(x=>x.classList.remove('active'));p.classList.add('active');
+  bStyle=p.dataset.style;renderBudget();
+});
+
+const initPct=(25000-5000)/(300000-5000)*100;
+document.getElementById('budgetSlider').style.background=`linear-gradient(to right,#E8A838 ${initPct}%,rgba(251,245,230,0.1) ${initPct}%)`;
+
+/* DEALS SLIDER */
+const DEALS=[
+  {badge:'hot',label:'Hot Deal',disc:'35% OFF',timer:true,img:'https://images.unsplash.com/photo-1548013146-72479768bada?w=800&q=85',region:'Uttar Pradesh · North India',rating:'4.9',reviews:'2.4k',title:'Golden Triangle',dur:'7N / 8D',desc:'Delhi to Agra to Jaipur. Taj Mahal sunrise, Amber Fort and Pink City bazaars with 4-star stays.',chips:['Hotel Included','Private Guide','All Meals','Transfers'],was:'Rs 45,000',price:'Rs 29,250',per:'per person'},
+  {badge:'new',label:'New Route',disc:'20% OFF',timer:false,img:'https://images.unsplash.com/photo-1609340540563-28e354d32a2e?w=800&q=85',region:'Ladakh · J&K',rating:'4.8',reviews:'1.1k',title:'Ladakh Expedition',dur:'9N / 10D',desc:'Pangong Lake, Nubra Valley and high-altitude passes with expert Himalayan guides.',chips:['4x4 Jeep','Camping','Permits','Oxygen Backup'],was:'Rs 68,000',price:'Rs 54,400',per:'per person'},
+  {badge:'deal',label:'Best Value',disc:'28% OFF',timer:false,img:'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800&q=85',region:'Kerala · South India',rating:'4.9',reviews:'3.1k',title:'Kerala Backwaters',dur:'5N / 6D',desc:'Private houseboat through Alleppey, Munnar tea estates and Kovalam beach with Ayurveda spa.',chips:['Houseboat','Ayurveda Spa','Spice Plantation','Beach Resort'],was:'Rs 38,000',price:'Rs 27,360',per:'per person'},
+  {badge:'hot',label:'Selling Fast',disc:'30% OFF',timer:true,img:'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=800&q=85',region:'Rajasthan · West India',rating:'4.8',reviews:'1.8k',title:'Royal Rajasthan',dur:'8N / 9D',desc:'Jaipur to Jodhpur to Jaisalmer to Udaipur. Palace hotels, camel dunes at sunset and lake boat rides.',chips:['Palace Hotels','Camel Safari','Boat Ride','Cultural Show'],was:'Rs 75,000',price:'Rs 52,500',per:'per person'},
+  {badge:'new',label:'New',disc:'15% OFF',timer:false,img:'https://images.unsplash.com/photo-1545987796-200677ee1011?w=800&q=85',region:'Lakshadweep · Islands',rating:'5.0',reviews:'480',title:'Lakshadweep Escape',dur:'5N / 6D',desc:'Coral atolls, turquoise lagoons and pristine snorkelling reefs — India best-kept island secret.',chips:['Island Permit','Resort Stay','Snorkelling','Glass-bottom Boat'],was:'Rs 1,10,000',price:'Rs 93,500',per:'per person'}
+];
+
+let dCur=0,dAuto=null,dBuilt=false;
+const D_AUTO=5000;
+const dTrack=document.getElementById('dealsTrack');
+const dPips=document.getElementById('dealsPips');
+const VISIBLE=3;
+
+function getCountdown(){
+  const now=new Date(),end=new Date(now.getFullYear(),now.getMonth(),now.getDate()+3,23,59,59);
+  let diff=Math.max(0,Math.floor((end-now)/1000));
+  const h=String(Math.floor(diff/3600)).padStart(2,'0');diff%=3600;
+  const m=String(Math.floor(diff/60)).padStart(2,'0'),s=String(diff%60).padStart(2,'0');
+  return{h,m,s};
+}
+
+function badgeCls(b){return{hot:'badge-hot',new:'badge-new',deal:'badge-deal'}[b]||'badge-hot';}
+
+function buildDeals(){
+  dBuilt=true;
+  dTrack.innerHTML=DEALS.map((d,i)=>{
+    const cd=d.timer?getCountdown():null;
+    const timerHtml=cd?`<div class="deal-timer"><span class="deal-timer-lbl">Ends in</span><div class="timer-boxes"><div class="tbox" id="dth${i}">${cd.h}</div><span class="tsep">:</span><div class="tbox" id="dtm${i}">${cd.m}</div><span class="tsep">:</span><div class="tbox" id="dts${i}">${cd.s}</div></div></div>`:'';
+    return`<div class="deal-card">
+      <div class="deal-img-wrap"><div class="deal-img" style="background-image:url('${d.img}')"></div><div class="deal-img-ov"></div>
+      <div class="deal-badges"><div class="deal-badge ${badgeCls(d.badge)}">${d.label}</div></div>
+      <div class="deal-disc">${d.disc}</div></div>
+      <div class="deal-body">
+        <div class="deal-top-row"><div class="deal-region">${d.region}</div><div class="deal-rating">&#9733; ${d.rating} <span>(${d.reviews})</span></div></div>
+        <div class="deal-title">${d.title}</div>
+        <div class="deal-dur">${d.dur}</div>
+        ${timerHtml}
+        <div class="deal-desc">${d.desc}</div>
+        <div class="deal-chips">${d.chips.map(c=>`<div class="deal-chip">${c}</div>`).join('')}</div>
+        <div class="deal-footer">
+          <div class="deal-price-wrap"><div class="deal-was">${d.was}</div><div class="deal-price">${d.price}</div><div class="deal-per">${d.per}</div></div>
+          <button class="deal-btn">Book Now</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Build pips
+  const maxSlide=DEALS.length-VISIBLE;
+  dPips.innerHTML=Array.from({length:maxSlide+1},(_,i)=>`<button class="deals-pip${i===0?' active':''}" data-i="${i}"></button>`).join('');
+  dPips.querySelectorAll('.deals-pip').forEach(p=>p.addEventListener('click',()=>dGoTo(parseInt(p.dataset.i))));
+
+  // Register arrow listeners HERE after DOM exists — using fresh clones to avoid duplicate listeners
+  const nBtn=document.getElementById('dealsNext');
+  const pBtn=document.getElementById('dealsPrev');
+  const nClone=nBtn.cloneNode(true); nBtn.parentNode.replaceChild(nClone,nBtn);
+  const pClone=pBtn.cloneNode(true); pBtn.parentNode.replaceChild(pClone,pBtn);
+  nClone.addEventListener('click',()=>{if(!dBuilt)return;dGoTo(dCur+1>DEALS.length-VISIBLE?0:dCur+1);});
+  pClone.addEventListener('click',()=>{if(!dBuilt)return;dGoTo(dCur-1<0?DEALS.length-VISIBLE:dCur-1);});
+
+  // Start countdown timers
+  DEALS.forEach((d,i)=>{
+    if(!d.timer)return;
+    setInterval(()=>{
+      const cd=getCountdown();
+      const h=document.getElementById('dth'+i),m=document.getElementById('dtm'+i),s=document.getElementById('dts'+i);
+      if(h)h.textContent=cd.h;if(m)m.textContent=cd.m;if(s)s.textContent=cd.s;
+    },1000);
+  });
+}
+
+function getCardW(){
+  const c=dTrack.querySelector('.deal-card');
+  if(!c)return 0;
+  return c.getBoundingClientRect().width+20;
+}
+
+function dGoTo(idx){
+  if(!dBuilt)return;
+  const max=DEALS.length-VISIBLE;
+  dCur=Math.max(0,Math.min(idx,max));
+  // Recalculate width fresh every time — avoids stale measurement
+  const card=dTrack.querySelector('.deal-card');
+  if(!card)return;
+  const w=card.getBoundingClientRect().width+20;
+  gsap.to(dTrack,{x:-(dCur*w),duration:.75,ease:'power3.inOut'});
+  dPips.querySelectorAll('.deals-pip').forEach((p,i)=>p.classList.toggle('active',i===dCur));
+  clearInterval(dAuto);
+  dAuto=setInterval(()=>dGoTo(dCur+1>DEALS.length-VISIBLE?0:dCur+1),D_AUTO);
+}
+
+/* arrow listeners moved inside buildDeals */
+
+// swipe
+let dSwipeX=null;
+const dViewport=document.querySelector('.deals-viewport');
+dViewport.addEventListener('mousedown',e=>{dSwipeX=e.clientX;});
+dViewport.addEventListener('mouseup',e=>{if(dSwipeX===null)return;const dx=e.clientX-dSwipeX;if(Math.abs(dx)>50){dx<0?dGoTo(dCur+1>DEALS.length-VISIBLE?0:dCur+1):dGoTo(dCur-1<0?DEALS.length-VISIBLE:dCur-1);}dSwipeX=null;});
+dViewport.addEventListener('touchstart',e=>{dSwipeX=e.touches[0].clientX;},{passive:true});
+dViewport.addEventListener('touchend',e=>{if(dSwipeX===null)return;const dx=e.changedTouches[0].clientX-dSwipeX;if(Math.abs(dx)>50){dx<0?dGoTo(dCur+1>DEALS.length-VISIBLE?0:dCur+1):dGoTo(dCur-1<0?DEALS.length-VISIBLE:dCur-1);}dSwipeX=null;},{passive:true});
+
+/* ALL ANIMS */
+function runAnims(){
+  // Hero entrance
+  gsap.timeline({delay:.1})
+    .fromTo('.hero-eyebrow',{y:30,opacity:0},{y:0,opacity:1,duration:.8,ease:'power3.out'},0)
+    .fromTo('.hero-title',{y:60,opacity:0},{y:0,opacity:1,duration:.9,ease:'power3.out'},.12)
+    .fromTo('.hero-desc',{y:24,opacity:0},{y:0,opacity:1,duration:.7,ease:'power3.out'},.3)
+    .fromTo('.hero-actions',{y:20,opacity:0},{y:0,opacity:1,duration:.6,ease:'power3.out'},.42)
+    .fromTo('.scroll-indicator',{opacity:0},{opacity:1,duration:.6},.7)
+    .fromTo('.hero-bar',{opacity:0},{opacity:1,duration:.6},.6);
+
+  // Hero BG parallax
+  gsap.to([heroBgA,heroBgB],{yPercent:30,ease:'none',scrollTrigger:{trigger:heroEl,start:'top top',end:'bottom top',scrub:true}});
+
+  // Dest grid parallax
+  gsap.utils.toArray('.dest-item-bg').forEach(el=>{
+    gsap.fromTo(el,{yPercent:-10},{yPercent:10,ease:'none',scrollTrigger:{trigger:el.closest('.dest-item'),start:'top bottom',end:'bottom top',scrub:true}});
+  });
+
+  // CTA parallax
+  gsap.to('#ctaBg',{yPercent:22,ease:'none',scrollTrigger:{trigger:'.cta-section',start:'top bottom',end:'bottom top',scrub:true}});
+
+  // Horizontal scroll — Popular Routes
+  const track=document.getElementById('hscrollTrack');
+  const trackW=track.scrollWidth-track.parentElement.offsetWidth;
+  gsap.to(track,{x:-trackW,ease:'none',scrollTrigger:{trigger:'.hscroll-section',start:'top top',end:()=>'+='+(trackW*1.5),scrub:1,pin:true}});
+  gsap.utils.toArray('.hs-card-img').forEach(el=>{
+    gsap.fromTo(el,{xPercent:-6},{xPercent:6,ease:'none',scrollTrigger:{trigger:el.closest('.hs-card'),start:'top bottom',end:'bottom top',scrub:true}});
+  });
+
+  // Section reveals
+  gsap.utils.toArray('.section-label,.featured-title').forEach(el=>{
+    gsap.fromTo(el,{y:40,opacity:0},{y:0,opacity:1,duration:.9,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 88%',toggleActions:'play none none none'}});
+  });
+  gsap.utils.toArray('.dest-item').forEach((el,i)=>{
+    gsap.fromTo(el,{y:60,opacity:0},{y:0,opacity:1,duration:.85,ease:'power3.out',delay:i*.1,scrollTrigger:{trigger:'.dest-grid',start:'top 80%',toggleActions:'play none none none'}});
+  });
+
+  // Budget planner reveal
+  ScrollTrigger.create({trigger:'#budget',start:'top 80%',onEnter:()=>{
+    gsap.fromTo('.budget-controls',{y:40,opacity:0},{y:0,opacity:1,duration:.8,ease:'power3.out'});
+    setTimeout(renderBudget,300);
+  }});
+
+  // Deals slider reveal
+  ScrollTrigger.create({trigger:'#deals',start:'top 82%',onEnter:()=>{
+    buildDeals();
+    gsap.fromTo('.deals-top',{y:30,opacity:0},{y:0,opacity:1,duration:.7,ease:'power3.out'});
+    gsap.fromTo('.deal-card',{y:50,opacity:0},{y:0,opacity:1,duration:.65,stagger:.1,ease:'power3.out',delay:.2});
+    dAuto=setInterval(()=>dGoTo(dCur+1>DEALS.length-VISIBLE?0:dCur+1),D_AUTO);
+  }});
+
+  // CTA reveal
+  gsap.fromTo('.cta-content',{y:50,opacity:0},{y:0,opacity:1,duration:1,ease:'power3.out',scrollTrigger:{trigger:'.cta-section',start:'top 75%',toggleActions:'play none none none'}});
+  gsap.fromTo('.footer-top > *',{y:30,opacity:0},{y:0,opacity:1,duration:.7,ease:'power3.out',stagger:.1,scrollTrigger:{trigger:'footer',start:'top 88%',toggleActions:'play none none none'}});
+}
+
+// Smooth nav scroll
+document.querySelectorAll('.nav-links a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t)gsap.to(window,{scrollTo:{y:t,offsetY:72},duration:1.2,ease:'power3.inOut'});
+  });
+});
+</script>
+</body>
+</html>

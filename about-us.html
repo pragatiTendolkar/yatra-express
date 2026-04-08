@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us — Yatra Express</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+:root{--green:#2D6A2E;--sage:#A8C97A;--sand:#E8C99A;--cream:#FBF5E6;--red:#C0392B;--gold:#E8A838;--dark:#0F1A10;--dark2:#132014;--dark3:#0C1610;--cream60:rgba(251,245,230,0.6);--cream30:rgba(251,245,230,0.3);--cream10:rgba(251,245,230,0.1);}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--cream);overflow-x:hidden;cursor:none;}
+
+/* CURSOR */
+.cursor{width:10px;height:10px;background:var(--red);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s;}
+.cursor-ring{width:36px;height:36px;border:1px solid rgba(192,57,43,0.5);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .35s,height .35s,border-color .2s;}
+body:has(a:hover) .cursor,body:has(button:hover) .cursor{width:5px;height:5px;}
+body:has(a:hover) .cursor-ring,body:has(button:hover) .cursor-ring{width:58px;height:58px;border-color:var(--red);}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 56px;height:72px;display:flex;align-items:center;transition:background .4s,backdrop-filter .4s;}
+.nav.scrolled{background:rgba(15,26,16,0.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(192,57,43,0.2);}
+.nav-logo{display:flex;align-items:center;gap:10px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.28em;font-weight:700;color:var(--cream);text-transform:uppercase;text-decoration:none;}
+.nav-logo svg{width:20px;height:20px;stroke:var(--cream);fill:none;stroke-width:1.5;}
+.nav-links{margin-left:auto;display:flex;gap:32px;align-items:center;list-style:none;}
+.nav-links a{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--cream60);text-decoration:none;position:relative;padding-bottom:3px;transition:color .2s;}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1.5px;background:var(--green);transition:width .3s cubic-bezier(0.22,1,0.36,1);}
+.nav-links a:hover{color:var(--cream);}
+.nav-links a:hover::after,.nav-links a.active::after{width:100%;}
+.nav-links a.active{color:var(--sage);}
+
+/* HERO */
+.hero{position:relative;height:100vh;min-height:600px;overflow:hidden;}
+.hero-bg{position:absolute;inset:-8%;background-size:cover;background-position:center;will-change:transform;background-image:url('https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1600&q=80');}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,26,16,0.88) 0%,rgba(15,26,16,0.42) 60%,rgba(15,26,16,0.1) 100%);z-index:1;}
+.hero-overlay2{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,26,16,0.7) 0%,transparent 55%);z-index:1;}
+.hero-content{position:absolute;z-index:10;bottom:140px;left:56px;max-width:520px;}
+.hero-eyebrow{display:flex;align-items:center;gap:12px;font-size:12px;letter-spacing:.14em;color:rgba(251,245,230,0.72);margin-bottom:14px;text-transform:uppercase;}
+.hero-eyebrow::before{content:'';width:28px;height:2px;background:var(--green);flex-shrink:0;}
+.hero-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(72px,9vw,110px);font-weight:900;color:var(--cream);line-height:.88;text-transform:uppercase;letter-spacing:-.01em;margin-bottom:22px;}
+.hero-title span{color:var(--sage);}
+.hero-desc{font-size:14px;color:var(--cream60);line-height:1.8;font-weight:300;max-width:380px;}
+.hero-scroll{position:absolute;bottom:40px;left:56px;z-index:10;display:flex;align-items:center;gap:14px;}
+.hero-scroll-line{width:52px;height:1px;background:rgba(251,245,230,0.2);position:relative;overflow:hidden;}
+.hero-scroll-line::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:var(--gold);animation:scrollLine 1.8s ease infinite;}
+@keyframes scrollLine{to{left:200%;}}
+.hero-scroll-text{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--cream30);}
+
+/* SECTION SHARED */
+section{position:relative;overflow:hidden;}
+.section-label{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--sage);font-weight:500;display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.section-label::before{content:'';width:32px;height:1.5px;background:var(--green);}
+.section-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(42px,5vw,64px);font-weight:800;line-height:.92;text-transform:uppercase;}
+
+/* STORY SECTION */
+.story{padding:120px 56px;background:var(--dark2);}
+.story-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;max-width:1300px;margin:0 auto;}
+.story-text .section-title{margin-bottom:30px;}
+.story-body{font-size:14px;color:var(--cream60);line-height:1.9;font-weight:300;margin-bottom:20px;}
+.story-body strong{color:var(--cream);font-weight:500;}
+.story-stat-row{display:flex;gap:40px;margin-top:48px;padding-top:40px;border-top:1px solid rgba(251,245,230,0.08);}
+.story-stat{display:flex;flex-direction:column;gap:4px;}
+.story-stat-num{font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:900;color:var(--gold);line-height:1;}
+.story-stat-label{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--cream60);}
+.story-img-wrap{position:relative;}
+.story-img-main{width:100%;height:520px;border-radius:20px;overflow:hidden;position:relative;}
+.story-img-main-bg{position:absolute;inset:-8%;background-size:cover;background-position:center;background-image:url('https://images.unsplash.com/photo-1548013146-72479768bada?w=900&q=80');transition:transform .8s cubic-bezier(0.22,1,0.36,1);}
+.story-img-main:hover .story-img-main-bg{transform:scale(1.05);}
+.story-img-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,26,16,.55) 0%,transparent 60%);}
+.story-img-accent{position:absolute;bottom:-32px;left:-32px;width:200px;height:160px;border-radius:14px;overflow:hidden;border:4px solid var(--dark2);}
+.story-img-accent-bg{position:absolute;inset:-8%;background-size:cover;background-position:center;background-image:url('https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=400&q=80');}
+.story-img-badge{position:absolute;top:24px;right:24px;background:rgba(15,26,16,0.82);backdrop-filter:blur(12px);border:1px solid rgba(232,168,56,0.25);border-radius:12px;padding:14px 18px;text-align:center;}
+.story-img-badge-num{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:900;color:var(--gold);line-height:1;display:block;}
+.story-img-badge-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--cream60);display:block;margin-top:3px;}
+
+/* VALUES SECTION */
+.values{padding:120px 56px;background:var(--dark3);}
+.values::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(45,106,46,0.07) 0%,transparent 70%);pointer-events:none;}
+.values-header{max-width:600px;margin-bottom:72px;}
+.values-header .section-title{margin-bottom:18px;}
+.values-subtitle{font-size:14px;color:var(--cream60);line-height:1.8;font-weight:300;}
+.values-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.val-card{background:var(--dark2);border:1px solid rgba(251,245,230,0.06);border-radius:20px;padding:40px 36px;position:relative;overflow:hidden;transition:border-color .35s,transform .4s cubic-bezier(0.22,1,0.36,1);}
+.val-card:hover{border-color:rgba(168,201,122,0.25);transform:translateY(-6px);}
+.val-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),var(--sage));transform:scaleX(0);transform-origin:left;transition:transform .4s cubic-bezier(0.22,1,0.36,1);}
+.val-card:hover::after{transform:scaleX(1);}
+.val-icon{width:48px;height:48px;border-radius:12px;background:rgba(45,106,46,0.15);border:1px solid rgba(45,106,46,0.3);display:flex;align-items:center;justify-content:center;margin-bottom:28px;}
+.val-icon svg{width:22px;height:22px;stroke:var(--sage);fill:none;stroke-width:1.5;}
+.val-num{position:absolute;top:28px;right:28px;font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:900;color:rgba(251,245,230,0.04);line-height:1;}
+.val-title{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;text-transform:uppercase;margin-bottom:14px;line-height:1;}
+.val-desc{font-size:13px;color:var(--cream60);line-height:1.8;font-weight:300;}
+
+/* TEAM SECTION */
+.team{padding:120px 56px;background:var(--dark2);}
+.team-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:64px;}
+.team-header-text .section-title{margin-bottom:0;}
+.team-header-desc{max-width:300px;font-size:13px;color:var(--cream60);line-height:1.75;font-weight:300;}
+.team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+.team-card{border-radius:18px;overflow:hidden;position:relative;cursor:pointer;aspect-ratio:3/4;}
+.team-card-img{position:absolute;inset:-8%;background-size:cover;background-position:center top;will-change:transform;transition:transform .7s cubic-bezier(0.22,1,0.36,1);}
+.team-card:hover .team-card-img{transform:scale(1.06);}
+.team-card-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,26,16,.92) 0%,rgba(15,26,16,.05) 60%);transition:background .4s;}
+.team-card:hover .team-card-ov{background:linear-gradient(to top,rgba(15,26,16,.96) 0%,rgba(15,26,16,.15) 60%);}
+.team-card-body{position:absolute;bottom:0;left:0;right:0;padding:22px 20px;}
+.team-card-role{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--sage);display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.team-card-role::before{content:'';width:10px;height:1.5px;background:var(--sage);}
+.team-card-name{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;text-transform:uppercase;line-height:1.1;margin-bottom:8px;}
+.team-card-bio{font-size:12px;color:var(--cream60);line-height:1.7;font-weight:300;transform:translateY(8px);opacity:0;transition:transform .35s,opacity .35s;}
+.team-card:hover .team-card-bio{transform:translateY(0);opacity:1;}
+
+/* JOURNEY TIMELINE */
+.journey{padding:120px 56px;background:var(--dark3);}
+.journey::before{content:'';position:absolute;bottom:-200px;left:-200px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(192,57,43,0.06) 0%,transparent 70%);pointer-events:none;}
+.journey-header{max-width:600px;margin-bottom:80px;}
+.timeline{position:relative;max-width:900px;margin:0 auto;}
+.timeline::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,rgba(168,201,122,0.25) 10%,rgba(168,201,122,0.25) 90%,transparent);transform:translateX(-50%);}
+.tl-item{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:64px;position:relative;}
+.tl-item:last-child{margin-bottom:0;}
+.tl-dot{position:absolute;left:50%;top:8px;width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid var(--dark3);transform:translateX(-50%);}
+.tl-dot.gold{background:var(--gold);}
+.tl-left{padding-right:56px;text-align:right;}
+.tl-right{padding-left:56px;}
+.tl-year{font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.tl-title{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;text-transform:uppercase;line-height:1.1;margin-bottom:10px;}
+.tl-desc{font-size:13px;color:var(--cream60);line-height:1.75;font-weight:300;}
+.tl-item:nth-child(even) .tl-left{padding-right:56px;text-align:right;order:1;}
+.tl-item:nth-child(even) .tl-right{padding-left:56px;order:2;}
+.tl-item:nth-child(odd) .tl-content{order:2;}
+.tl-item:nth-child(odd) .tl-empty{order:1;}
+.tl-item:nth-child(even) .tl-content{order:1;text-align:right;}
+.tl-item:nth-child(even) .tl-empty{order:2;}
+
+/* CTA SECTION */
+.cta-section{position:relative;height:480px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.cta-bg{position:absolute;inset:-8%;background-size:cover;background-position:center;background-image:url('https://images.unsplash.com/photo-1477587458883-47145ed94245?w=1600&q=80');will-change:transform;}
+.cta-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(15,26,16,0.92) 0%,rgba(15,26,16,0.72) 100%);}
+.cta-content{position:relative;z-index:10;text-align:center;max-width:560px;}
+.cta-label{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--sage);display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px;}
+.cta-label::before,.cta-label::after{content:'';width:24px;height:1.5px;background:var(--green);}
+.cta-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(48px,6vw,72px);font-weight:900;text-transform:uppercase;line-height:.92;margin-bottom:20px;}
+.cta-desc{font-size:13px;color:var(--cream60);line-height:1.8;font-weight:300;margin-bottom:36px;}
+.btn-green{display:inline-flex;align-items:center;gap:8px;background:var(--green);color:var(--cream);font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;padding:13px 28px;border-radius:100px;border:none;cursor:pointer;transition:background .25s,transform .2s;text-decoration:none;}
+.btn-green:hover{background:var(--sage);color:var(--dark);transform:translateY(-2px);}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--cream);border:1px solid var(--cream30);padding:13px 24px;border-radius:100px;background:none;cursor:pointer;transition:border-color .25s,background .25s,transform .2s;text-decoration:none;margin-left:12px;}
+.btn-ghost:hover{border-color:var(--cream);background:var(--cream10);transform:translateY(-2px);}
+
+/* FOOTER */
+footer{background:var(--dark3);padding:72px 56px 36px;border-top:1px solid rgba(251,245,230,0.06);}
+.footer-top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:48px;margin-bottom:56px;}
+.footer-brand{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.28em;font-weight:700;color:var(--cream);text-transform:uppercase;margin-bottom:14px;}
+.footer-tagline{font-size:13px;color:var(--cream60);line-height:1.8;font-weight:300;margin-bottom:24px;}
+.footer-col-title{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--sage);margin-bottom:20px;}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.footer-links a{font-size:13px;color:var(--cream60);text-decoration:none;transition:color .2s;}
+.footer-links a:hover{color:var(--cream);}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:28px;border-top:1px solid rgba(251,245,230,0.06);}
+.footer-copy{font-size:11px;color:rgba(251,245,230,0.25);letter-spacing:.08em;}
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-logo">
+    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    Yatra Express
+  </a>
+  <ul class="nav-links">
+   <li><a href="/" class="active">Home</a></li>
+    <li><a href="taj-mahal.html">VR Experience</a></li>
+    <li><a href="about-us.html">About US</a></li>
+    <!-- <li><a href="budget.html">Plan Trip</a></li> -->
+    <li><a href="deals.html">Deals</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-overlay2"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Our Story</div>
+    <h1 class="hero-title">Born From<br><span>Wanderlust</span></h1>
+    <p class="hero-desc">We are a team of passionate travellers who believe India is not just a destination — it is a feeling. Since 2009, we have been turning that feeling into unforgettable journeys.</p>
+  </div>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    <span class="hero-scroll-text">Scroll to explore</span>
+  </div>
+</section>
+
+<!-- OUR STORY -->
+<section class="story" id="story">
+  <div class="story-inner">
+    <div class="story-text">
+      <div class="section-label">Who We Are</div>
+      <div class="section-title">Crafting<br>Journeys<br>Since 2009</div>
+      <p class="story-body" style="margin-top:30px;">Yatra Express began as a <strong>small passion project</strong> by a group of travel-obsessed friends who were tired of cookie-cutter tour packages. We wanted something more — raw, authentic, deeply personal encounters with the real India.</p>
+      <p class="story-body">Today, we are a <strong>team of 60+ travel experts, local guides, and experience architects</strong> spread across 14 Indian cities. Every itinerary we create is handcrafted, every destination vetted by boots on the ground, and every traveller treated like a lifelong friend.</p>
+      <p class="story-body">We do not just book trips — we <strong>design experiences that stay with you forever.</strong></p>
+      <div class="story-stat-row">
+        <div class="story-stat">
+          <span class="story-stat-num">48K+</span>
+          <span class="story-stat-label">Happy Travellers</span>
+        </div>
+        <div class="story-stat">
+          <span class="story-stat-num">320+</span>
+          <span class="story-stat-label">Curated Routes</span>
+        </div>
+        <div class="story-stat">
+          <span class="story-stat-num">15</span>
+          <span class="story-stat-label">Years of Expertise</span>
+        </div>
+      </div>
+    </div>
+    <div class="story-img-wrap">
+      <div class="story-img-main">
+        <div class="story-img-main-bg"></div>
+        <div class="story-img-ov"></div>
+      </div>
+      <div class="story-img-accent">
+        <div class="story-img-accent-bg"></div>
+      </div>
+      <div class="story-img-badge">
+        <span class="story-img-badge-num">4.9</span>
+        <span class="story-img-badge-label">Avg. Rating</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OUR VALUES -->
+<section class="values" id="values">
+  <div class="values-header">
+    <div class="section-label">What Drives Us</div>
+    <div class="section-title">Our Core<br>Values</div>
+    <p class="values-subtitle" style="margin-top:20px;">Every decision we make, every destination we recommend, and every guide we train is grounded in these principles.</p>
+  </div>
+  <div class="values-grid">
+    <div class="val-card">
+      <div class="val-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="val-num">01</div>
+      <div class="val-title">Authentic<br>Experiences</div>
+      <p class="val-desc">No tourist traps. No manufactured moments. We go where the locals go, eat what the locals eat, and sleep where the stories are told under starlit skies.</p>
+    </div>
+    <div class="val-card">
+      <div class="val-icon">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div class="val-num">02</div>
+      <div class="val-title">Community<br>First</div>
+      <p class="val-desc">Tourism should lift communities, not just enrich corporations. We work exclusively with local guides, family-run stays, and village artisans who know their land best.</p>
+    </div>
+    <div class="val-card">
+      <div class="val-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 6v6l4 2"/></svg>
+      </div>
+      <div class="val-num">03</div>
+      <div class="val-title">Unhurried<br>Travel</div>
+      <p class="val-desc">India cannot be rushed. We build itineraries that breathe — with room for detours, chai breaks, and conversations that change your perspective on the world.</p>
+    </div>
+    <div class="val-card">
+      <div class="val-icon">
+        <svg viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+      <div class="val-num">04</div>
+      <div class="val-title">Radical<br>Transparency</div>
+      <p class="val-desc">No hidden fees, no vague itineraries, no bait-and-switch. Every rupee is accounted for and every detail is confirmed long before you pack your bag.</p>
+    </div>
+    <div class="val-card">
+      <div class="val-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      </div>
+      <div class="val-num">05</div>
+      <div class="val-title">Responsible<br>Tourism</div>
+      <p class="val-desc">We offset carbon on every trip, promote zero-plastic trails, and donate 2% of every booking to conservation efforts across India's fragile ecosystems.</p>
+    </div>
+    <div class="val-card">
+      <div class="val-icon">
+        <svg viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+      </div>
+      <div class="val-num">06</div>
+      <div class="val-title">Obsessive<br>Quality</div>
+      <p class="val-desc">From the thread count of your sheets to the timing of a sunset boat ride — every detail is obsessed over, tested, and refined until it is just right.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team" id="team">
+  <div class="team-header">
+    <div class="team-header-text">
+      <div class="section-label">The People Behind the Magic</div>
+      <div class="section-title">Meet the<br>Team</div>
+    </div>
+    <p class="team-header-desc">Every one of us has personally walked the routes we sell. We are travellers first, travel agents second.</p>
+  </div>
+  <div class="team-grid">
+    <div class="team-card">
+      <div class="team-card-img" style="background-image:url('https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80')"></div>
+      <div class="team-card-ov"></div>
+      <div class="team-card-body">
+        <div class="team-card-role">Co-Founder & CEO</div>
+        <div class="team-card-name">Arjun Mehta</div>
+        <p class="team-card-bio">Walked the Chadar trek four times. Believes every journey begins with the right chai.</p>
+      </div>
+    </div>
+    <div class="team-card">
+      <div class="team-card-img" style="background-image:url('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80')"></div>
+      <div class="team-card-ov"></div>
+      <div class="team-card-body">
+        <div class="team-card-role">Head of Experiences</div>
+        <div class="team-card-name">Priya Nair</div>
+        <p class="team-card-bio">Kerala born, world-wandered. Has designed over 200 curated South India itineraries.</p>
+      </div>
+    </div>
+    <div class="team-card">
+      <div class="team-card-img" style="background-image:url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80')"></div>
+      <div class="team-card-ov"></div>
+      <div class="team-card-body">
+        <div class="team-card-role">Senior Route Architect</div>
+        <div class="team-card-name">Vikram Singh</div>
+        <p class="team-card-bio">Rajasthan royalist. Maps desert routes by camel and converted ancient havelis into stays.</p>
+      </div>
+    </div>
+    <div class="team-card">
+      <div class="team-card-img" style="background-image:url('https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80')"></div>
+      <div class="team-card-ov"></div>
+      <div class="team-card-body">
+        <div class="team-card-role">Traveller Relations Lead</div>
+        <div class="team-card-name">Sana Qureshi</div>
+        <p class="team-card-bio">Fluent in six languages. Has guided solo travellers from 40+ countries across the Himalayas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE / JOURNEY -->
+<section class="journey" id="journey">
+  <div class="journey-header">
+    <div class="section-label">Our Journey</div>
+    <div class="section-title">How We Got<br>Here</div>
+  </div>
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-content tl-left">
+        <div class="tl-year">2009</div>
+        <div class="tl-title">The First Trip</div>
+        <p class="tl-desc">Four friends, a Tata Sumo, and a handwritten map of Rajasthan. That road trip sparked the idea that real India needed a different kind of travel company.</p>
+      </div>
+      <div class="tl-empty tl-right"></div>
+      <div class="tl-dot"></div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-empty tl-left"></div>
+      <div class="tl-content tl-right">
+        <div class="tl-year">2012</div>
+        <div class="tl-title">Officially Founded</div>
+        <p class="tl-desc">Yatra Express was registered in Mumbai with a team of 6, an office the size of a broom closet, and 12 hand-picked itineraries. All 12 sold out in year one.</p>
+      </div>
+      <div class="tl-dot"></div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-content tl-left">
+        <div class="tl-year">2016</div>
+        <div class="tl-title">10,000 Travellers</div>
+        <p class="tl-desc">We crossed our first major milestone — 10,000 happy travellers — and expanded operations to Jaipur, Kochi, and Varanasi, embedding ourselves deeper into local communities.</p>
+      </div>
+      <div class="tl-empty tl-right"></div>
+      <div class="tl-dot gold"></div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-empty tl-left"></div>
+      <div class="tl-content tl-right">
+        <div class="tl-year">2020</div>
+        <div class="tl-title">Going Digital</div>
+        <p class="tl-desc">Amid the pandemic, we pivoted fast — launching virtual India tours, local artisan marketplaces, and the foundation for this very platform you're browsing today.</p>
+      </div>
+      <div class="tl-dot"></div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-content tl-left">
+        <div class="tl-year">2024</div>
+        <div class="tl-title">48,000+ Journeys</div>
+        <p class="tl-desc">Today we operate across 14 cities, partner with 800+ local hosts, and have been featured in Condé Nast Traveller India and National Geographic as one of India's most trusted travel companies.</p>
+      </div>
+      <div class="tl-empty tl-right"></div>
+      <div class="tl-dot gold"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-bg" id="ctaBg"></div>
+  <div class="cta-overlay"></div>
+  <div class="cta-content">
+    <div class="cta-label">Start Your Journey</div>
+    <h2 class="cta-title">Let's Go<br>Somewhere Real</h2>
+    <p class="cta-desc">Whether you have a destination in mind or just a feeling in your heart, our team is ready to craft the perfect Indian adventure for you.</p>
+    <a href="#" class="btn-green">Plan My Trip</a>
+    <a href="#" class="btn-ghost">Get In Touch</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-brand">Yatra Express</div>
+      <p class="footer-tagline">Discover the extraordinary in every corner of Incredible India. Handcrafted journeys, local wisdom, unforgettable memories.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Explore</div>
+      <ul class="footer-links">
+        <li><a href="#">Destinations</a></li>
+        <li><a href="#">Popular Routes</a></li>
+        <li><a href="#">Budget Planner</a></li>
+        <li><a href="#">Deals & Offers</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-links">
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Our Team</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Press</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Support</div>
+      <ul class="footer-links">
+        <li><a href="#">Contact</a></li>
+        <li><a href="#">FAQs</a></li>
+        <li><a href="#">Terms</a></li>
+        <li><a href="#">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2025 Yatra Express. All rights reserved.</span>
+    <span class="footer-copy">Made with love in India 🇮🇳</span>
+  </div>
+</footer>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// Cursor
+const cursor=document.getElementById('cursor');
+const ring=document.getElementById('cursorRing');
+document.addEventListener('mousemove',e=>{
+  gsap.to(cursor,{x:e.clientX,y:e.clientY,duration:.1});
+  gsap.to(ring,{x:e.clientX,y:e.clientY,duration:.35});
+});
+
+// Nav scroll
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>{
+  nav.classList.toggle('scrolled',window.scrollY>40);
+});
+
+// Hero BG parallax
+gsap.to('#heroBg',{yPercent:30,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:true}});
+
+// CTA BG parallax
+gsap.to('#ctaBg',{yPercent:22,ease:'none',scrollTrigger:{trigger:'.cta-section',start:'top bottom',end:'bottom top',scrub:true}});
+
+// Hero entrance
+gsap.timeline({delay:.2})
+  .fromTo('.hero-eyebrow',{y:30,opacity:0},{y:0,opacity:1,duration:.8,ease:'power3.out'},0)
+  .fromTo('.hero-title',{y:60,opacity:0},{y:0,opacity:1,duration:.9,ease:'power3.out'},.12)
+  .fromTo('.hero-desc',{y:24,opacity:0},{y:0,opacity:1,duration:.7,ease:'power3.out'},.3)
+  .fromTo('.hero-scroll',{opacity:0},{opacity:1,duration:.6},.7);
+
+// Section reveals
+gsap.utils.toArray('.section-label, .section-title').forEach(el=>{
+  gsap.fromTo(el,{y:40,opacity:0},{y:0,opacity:1,duration:.9,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 88%',toggleActions:'play none none none'}});
+});
+
+// Story section
+gsap.fromTo('.story-text',{x:-40,opacity:0},{x:0,opacity:1,duration:1,ease:'power3.out',scrollTrigger:{trigger:'.story-inner',start:'top 80%',toggleActions:'play none none none'}});
+gsap.fromTo('.story-img-wrap',{x:40,opacity:0},{x:0,opacity:1,duration:1,ease:'power3.out',scrollTrigger:{trigger:'.story-inner',start:'top 80%',toggleActions:'play none none none'}});
+gsap.fromTo('.story-stat',{y:30,opacity:0},{y:0,opacity:1,duration:.7,ease:'power3.out',stagger:.15,scrollTrigger:{trigger:'.story-stat-row',start:'top 88%',toggleActions:'play none none none'}});
+
+// Values grid
+gsap.fromTo('.val-card',{y:60,opacity:0},{y:0,opacity:1,duration:.8,ease:'power3.out',stagger:.1,scrollTrigger:{trigger:'.values-grid',start:'top 80%',toggleActions:'play none none none'}});
+
+// Team grid
+gsap.fromTo('.team-card',{y:60,opacity:0},{y:0,opacity:1,duration:.8,ease:'power3.out',stagger:.12,scrollTrigger:{trigger:'.team-grid',start:'top 80%',toggleActions:'play none none none'}});
+
+// Timeline items
+gsap.utils.toArray('.tl-item').forEach((el,i)=>{
+  gsap.fromTo(el,{y:40,opacity:0},{y:0,opacity:1,duration:.8,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 85%',toggleActions:'play none none none'}});
+});
+
+// CTA
+gsap.fromTo('.cta-content',{y:50,opacity:0},{y:0,opacity:1,duration:1,ease:'power3.out',scrollTrigger:{trigger:'.cta-section',start:'top 75%',toggleActions:'play none none none'}});
+
+// Footer
+gsap.fromTo('.footer-top > *',{y:30,opacity:0},{y:0,opacity:1,duration:.7,ease:'power3.out',stagger:.1,scrollTrigger:{trigger:'footer',start:'top 88%',toggleActions:'play none none none'}});
+</script>
+</body>
+</html>
